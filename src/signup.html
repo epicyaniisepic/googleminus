@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+  <title>Google Minus - Sign up</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://localhost:3000/external/bootstrap.min.css">
+  <script src="http://localhost:3000/external/jquery.min.js"></script>
+  <script src="http://localhost:3000/external/bootstrap.min.js"></script>
+  <script src="http://localhost:3000/external/angular.min.js"></script>
+  <script>
+     var myApp = angular.module('myApp', [])
+   
+  myApp.controller('SignController', ['$scope', '$http', function($scope, $http) {
+       $scope.submit = function(uEmail, uLname, uFname, uMinit, uPword) {
+       	var userInfo = {
+			email: uEmail,
+			lastname: uLname,
+			firstname: uFname,
+			middleinit: uMinit,
+			password: uPword
+		};
+		var jsonString = JSON.stringify(userInfo, null, 2);
+       	$http.get("http://localhost:3000/submit/" + jsonString)
+       	.then(function(response) {
+       		alert(response.data);
+       	})
+       }
+    }])
+
+
+  </script>
+</head>
+<body>
+	<h1>Google Minus</h1><br>
+	<h2>Sign Up</h2><br><br>
+	<div ng-app="myApp" ng-controller="SignController">
+		<label>Email: </label>
+		<input type="text" ng-model="email" placeholder="Enter email"><br>
+		<label>Last Name: </label>
+		<input type="text" ng-model="lname" placeholder="Enter last name">
+		<label>First Name: </label>
+		<input type="text" ng-model="fname" placeholder="Enter first name">
+		<label>Middle Initial: </label>
+		<input type="text" ng-model="minit" placeholder="Enter middle initial"><br>
+		<label>Password: </label>
+		<input type="password" ng-model="pword" placeholder="Enter password"><br><br>
+		<button ng-click="submit(email,lname,fname,minit,pword)">Submit</button>
+	</div>
+</html>
