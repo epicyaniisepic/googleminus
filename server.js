@@ -33,6 +33,17 @@ app.get('/submit/:data', function(req, res) {
 	})
 });
 
+app.get('/viewUsers', function (req, res) {
+    res.sendFile(path.join(__dirname + '/src/dbsample.html'));
+});
+app.get('/viewUsers/data', function(req, res) {
+  connection.query('SELECT * FROM userinfo', function(err, rows, fields) {
+    if (!err) {
+        res.send(rows)
+    }
+  })
+})
+
 app.listen(3000,function() {
     console.log("Server is running at port 3000")
 });
