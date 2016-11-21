@@ -15,14 +15,14 @@ CREATE TABLE IF NOT EXISTS post (
 	postid int(2) NOT NULL AUTO_INCREMENT,
 	authorid int(2) NOT NULL,
 	content varchar(100) NOT NULL,
-	timestamp date NOT NULL,
+	postdate date NOT NULL,
 	constraint post_postid_pk primary key(postid)
 );
 
 CREATE TABLE IF NOT EXISTS comment(
 	commentid int(2) NOT NULL AUTO_INCREMENT,
 	content varchar(100) NOT NULL,
-	timestamp date NOT NULL,
+	postdate date NOT NULL,
 	commenterid int(2) NOT NULL,
 	postid int(2) NOT NULL,
 	constraint comment_commentid_pk primary key(commentid)
@@ -41,6 +41,13 @@ CREATE TABLE IF NOT EXISTS circle(
 	userid int(2) NOT NULL,
 	friendid int(2) NOT NULL,
 	constraint circle_circleid_pk primary key(circleid)
+);
+
+CREATE TABLE IF NOT EXISTS friend(
+	rowid int(2) NOT NULL AUTO_INCREMENT,
+	userId int(2) NOT NULL,
+	friendId int(2) NOT NULL,
+	constraint friend_rowid_pk primary key(rowid)
 );
 
 CREATE USER user IDENTIFIED BY 'useruser';
