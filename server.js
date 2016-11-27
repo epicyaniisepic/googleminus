@@ -13,7 +13,8 @@ const connection = mysql.createConnection({
 	database: 'googleminus'
 })
 
-var userId = 0;
+var searchedUserId = 0;
+var token = "";
 var currentUser = null;
 connection.connect();
 
@@ -32,12 +33,24 @@ app.get('/signup/:data', function(req, res) {
 	connection.query('select * from userinfo where email = ?', info.email, function(err,rows,fields) {
 		if (!err) {
 			if (rows.length != 0) res.send("Sorry, email address already exists.");
-			else connection.query('insert into userinfo set ?', info, function(err,rows,fields) {
+			else {
+				connection.query('insert into userinfo set ?', info, function(err,rows,fields) {
 				if (!err) {
-					res.send("Welcome " + info.firstname + '!');
+					token = "";
+					connection.query('select * from userinfo where email = ?',info.email, function(err, rows, fields) {
+							currentUser = rows[0];
+							var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+							for (var i=0;i<30;i++) {
+							    token += possible.charAt(Math.floor(Math.random() * possible.length));
+							}
+							connection.query('update userinfo set token = ? where userid = ?',[token, currentUser.userid],function(err, rows, fields) {
+							});
+							res.send("Welcome " + currentUser.firstname + '!');
+						})	
 				}
 				else res.send("Error");
-			})
+				})
+			}
 		}
 		else res.send("An error occured.");
 	})
@@ -48,11 +61,15 @@ app.get('/signin/:data',function(req,res) {
 	connection.query('select * from userinfo where email = ? and password = ?',[info.email,info.password],function(err,rows,fields) {
 		if (!err) { 
 			if (rows.length != 0) {
-				//generate token
-				//save token to a variable
-				//save current user
-				//insert token to database alongside current user
-				res.send("Welcome back " + rows[0].firstname + '!');
+				token = "";
+				var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+				for (var i=0;i<30;i++) {
+				    token += possible.charAt(Math.floor(Math.random() * possible.length));
+				}
+				currentUser = rows[0];
+				connection.query('update userinfo set token = ? where userid = ?',[token,currentUser.userid],function(err, rows, fields) {
+				});
+				res.send("Welcome back " + currentUser.firstname + '!');
 			}
 			else res.send(false);			
 		}
@@ -60,71 +77,225 @@ app.get('/signin/:data',function(req,res) {
 });
 
 app.get('/viewUsers', function (req, res) {
-    res.sendFile(path.join(__dirname + '/src/dbsample.html'));
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			res.sendFile(path.join(__dirname + '/src/dbsample.html'));res.sendFile(path.join(__dirname + '/src/dbsample.html'));
+		}
+		else {
+			currentUser = null;
+			res.send("Access Denied. Please log in.");
+		}
+	})
 });
+
 app.get('/viewUsers/data', function(req, res) {
-  connection.query('SELECT * FROM userinfo', function(err, rows, fields) {
-    if (!err) {
-        res.send(rows)
-    }
-  })
-})
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			connection.query('SELECT * FROM userinfo', function(err, rows, fields) {
+			    if (!err) {
+			        res.send(rows)
+			    }
+			})
+		}
+		else {
+			currentUser = null;
+			//access denied, please sign in
+		}
+	})
+});
 
 app.get('/dummySearch', function(req,res) {
-	res.sendFile(path.join(__dirname + '/src/dummySearch.html'));
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			res.sendFile(path.join(__dirname + '/src/dummySearch.html'));
+		}
+		else {
+			currentUser = null;
+			res.send("Access Denied. Please log in.");
+		}
+	})
 })
 
 app.get('/search', function(req,res) {
-	res.send("OK");
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			res.send("OK");
+		}
+		else {
+			currentUser = null;
+			res.send(false);
+			//access denied, please sign in
+		}
+	})
 })
 
 app.get('/searchUser/:data', function(req,res) {
-	var info = JSON.parse(req.params.data)
-	connection.query('SELECT * from userinfo where firstname = ? and middleinit = ? and lastname = ?',[info.firstname, info.middleinit, info.lastname],function(err,rows,fields) {
-		if (!err) {
-			if (rows.length != 0) {
-				res.send("User Found!");
-				userId = rows[0].userid;
-			}
-			else {
-				res.send(false);
-			}
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			var info = JSON.parse(req.params.data)
+			connection.query('SELECT * from userinfo where firstname = ? and middleinit = ? and lastname = ?',[info.firstname, info.middleinit, info.lastname],function(err,rows,fields) {
+				if (!err) {
+					if (rows.length != 0) {
+						res.send("User Found!");
+						searchedUserId = rows[0].userid;
+					}
+					else {
+						res.send(false);
+					}
+				}
+			})
+		}
+		else {
+			currentUser = null;
+			res.send(0);
+			//access denied, please sign in
 		}
 	})
 })
 
 app.get('/profile',function(req,res) {
-	res.sendFile(path.join(__dirname + '/src/profile.html'));
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			res.sendFile(path.join(__dirname + '/src/profile.html'));
+		}
+		else {
+			res.send("Access Denied. Please log in.");
+			currentUser = null;
+		}
+	})
 })
 
 app.get('/getInfo', function(req, res) {
-	connection.query('select * from userinfo where userid = ?',userId,function(err,rows,fields) {
-		if (!err) {
-			console.log(rows);
-			res.send(rows);
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			connection.query('select * from userinfo where userid = ?',searchedUserId,function(err,rows,fields) {
+				if (!err) {
+					console.log(rows);
+					res.send(rows);
+				}
+			})
+		}
+		else {
+			currentUser = null;
+			res.send(false);
+			//access denied, please sign in
 		}
 	})
 });
 
 app.get('/getPosts', function(req, res) {
-	connection.query('select * from post where authorid = ? order by postid desc',userId,function(err,rows,fields) {
-		if (!err) {
-			console.log(rows);
-			res.send(rows);
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			connection.query('select * from post where authorid = ? order by postid desc',searchedUserId,function(err,rows,fields) {
+				if (!err) {
+					if (rows.length == 0) {
+						console.log("No posts.");
+						res.send(true);
+					}
+					else {
+						res.send(rows);
+					}
+				}
+				else console.log(err);
+			})
 		}
-		else console.log(err);
+		else {
+			currentUser = null;
+			res.send(false);
+			//access denied, please sign in
+		}
 	})
 });
 
 app.get('/getFriends', function(req, res) {
-	connection.query('select lastname, firstname, middleinit from userinfo, friend where userinfo.userid = friend.friendId and friend.userId = ?',userId, function(err,rows,fields) {
-		if (!err) {
-			console.log(rows);
-			res.send(rows);
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			connection.query('select lastname, firstname, middleinit from userinfo, friend where userinfo.userid = friend.friendId and friend.userId = ?',searchedUserId, function(err,rows,fields) {
+				if (!err) {
+					if (rows.length == 0) {
+						console.log("No friends.");
+						res.send(true);
+					}
+					else {
+						res.send(rows);
+					}
+				}
+				else console.log(err);
+			})
 		}
-		else console.log(err);
+		else {
+			currentUser = null;
+			res.send(0);
+			//access denied, please sign in
+		}
 	})
 });
+
+app.get('/addToCircle', function(req,res) {
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			res.sendFile(path.join(__dirname + '/src/addToCircle.html'));
+		}
+		else {
+			currentUser = null;
+			//access denied, please sign in
+		}
+	})
+})
+
+app.get('/addToCircle/:circlename', function(req,res) {
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			if (searchedUserId != 0) {
+				var entry = {
+					'circlename': req.params.circlename,
+					'userid': currentUser.userid,
+					'friendid': searchedUserId
+				};
+				connection.query('insert into circle set ?', entry, function(err,rows,fields) {
+					if (!err) {
+						res.send("OK");
+					}
+					else {
+						res.send("Error");
+					}
+				})
+			}
+			else {
+				res.send(0);
+			}
+		}
+		else {
+			currentUser = null;
+			res.send(false);
+			//access denied, please sign in
+		}
+	})
+})
+
+app.get('/getCircles', function(req,res) {
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			connection.query('select distinct circlename from circle where userid = ?',currentUser.userid,function(err,rows,fields) {
+				if (!err) {
+					console.log(rows);
+					if (rows.length == 0) {
+						res.send(true);
+					}
+					else {
+						res.send(rows);
+					}
+				}
+				else console.log(err);
+			})
+		}
+		else {
+			currentUser = null;
+			res.send(false);
+			//access denied, please sign in
+		}
+	})
+})
 
 app.listen(3000,function() {
     console.log("Server is running at port 3000")

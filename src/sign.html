@@ -24,6 +24,7 @@
        	$http.get("http://localhost:3000/signup/" + jsonString)
        	.then(function(response) {
        		alert(response.data);
+       		window.location.href = "http://localhost:3000/dummySearch";
        	})
        }
     }])
@@ -43,7 +44,7 @@
              }
               else {
                 alert(response.data);
-                window.location.href = "http://localhost:3000/home";
+                window.location.href = "http://localhost:3000/dummySearch";
               }
    		})
        }

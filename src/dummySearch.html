@@ -12,10 +12,13 @@
     //Put your scripts here
     var myApp = angular.module('myApp', [])
    
-  myApp.controller('SearchController', ['$scope', '$http', function($scope, $http) {
+    myApp.controller('SearchController', ['$scope', '$http', function($scope, $http) {
        $http.get('http://localhost:3000/search').then(
         function(response) {
-          //First function handles success
+          if (response.data == false) {
+            alert("Access Denied. Please log in.");
+            window.location.href = "http://localhost:3000/sign";
+          }
           $scope.search = function(fname, minit, lname){
             var userInfo = {
               firstname: fname,
@@ -28,6 +31,10 @@
               if (response.data == false) {
                 alert("User not found.");
                 window.location.href = "http://localhost:3000/dummySearch";
+              }
+              else if (response.data == 0) {
+                alert("Access Denied. Please log in.");
+                window.location.href = "http://localhost:3000/";     
               }
               else {
                 alert(response.data);

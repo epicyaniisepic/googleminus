@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS userinfo (
 	firstname varchar(50) NOT NULL,
 	middleinit varchar(3) NOT NULL,
 	password varchar(50) NOT NULL,
+	token varchar(50) default NULL,
 	constraint userinfo_userid_pk primary key(userid)
 );
 

@@ -15,6 +15,10 @@
        		$http.get('http://localhost:3000/getInfo').then(
         	function(response) {
           	//First function handles success
+              if (response.data == false) {
+                alert("Access Denied. Please log in");
+                window.location.href = "http://localhost:3000/";
+              }
 	          	$scope.info = response.data;
 	        },
 	        function(response) {
@@ -27,8 +31,13 @@
           $http.get('http://localhost:3000/getPosts').then(
           function(response) {
             //First function handles success
-              //alert(response.data);
-              $scope.posts = response.data;
+              if (response.data == false) {
+                alert("Access Denied. Please log in");
+                window.location.href = "http://localhost:3000/";
+              }
+              else {
+                $scope.posts = response.data;
+              }
           },
           function(response) {
             //Second function handles error
@@ -40,8 +49,13 @@
           $http.get('http://localhost:3000/getFriends').then(
           function(response) {
             //First function handles success
-              //alert(response.data);
-              $scope.friends = response.data;
+              if (response.data == false) {
+                alert("Access Denied. Please log in");
+                window.location.href = "http://localhost:3000/";
+              }
+              else {
+                $scope.friends = response.data;
+              }
           },
           function(response) {
             //Second function handles error
@@ -92,9 +106,9 @@
         <tr>
           <td><h3>{{x.firstname}} {{x.middleinit}} {{x.lastname}}</h3></td>
         </tr>
-      </tbody>
+      </tbody> 
       </table>
     </div>
-
+      <a href="http://localhost:3000/addToCircle"><button>Add To Circle</button></a>
 </body>
 </html>
