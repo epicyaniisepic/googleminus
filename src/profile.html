@@ -20,6 +20,25 @@
                 window.location.href = "http://localhost:3000/";
               }
 	          	$scope.info = response.data;
+              $scope.goToHome = function() {
+                window.location.href = "http://localhost:3000/feeds"
+              }
+              $scope.logOut = function() {
+                $http.get('http://localhost:3000/logout/').then(
+                  function(response) {
+                    if (response.data == false) {
+                      alert("An error occured.");
+                    }
+                    else {
+                      alert("Thank you!");
+                      window.location.href = "http://localhost:3000/"
+                    }
+                  }
+                ) 
+              }
+              $scope.search = function() {
+                window.location.href = "http://localhost:3000/userSearch"
+             }
 	        },
 	        function(response) {
 	          //Second function handles error
@@ -37,6 +56,40 @@
               }
               else {
                 $scope.posts = response.data;
+              }
+               $scope.showComments = function(postID){
+                var posts = {
+                  postid: postID
+                }
+                var jsonString = JSON.stringify(posts, null, 2);
+                $http.get('http://localhost:3000/loadComments/'+jsonString).then(
+                  function(response) {
+                    if (response.data == false) {
+                        alert("No comments.");
+                      }
+                      else {
+                        $scope.comments = response.data;
+                      }
+                  }
+                )
+              }
+              $scope.addComment = function(postID, comment) {
+                var ownComment = {
+                  postid: postID,
+                  content: comment
+                }
+                var jsonString = JSON.stringify(ownComment, null, 2);
+                $http.get('http://localhost:3000/addComment/'+jsonString).then(
+                  function(response) {
+                    if (response.data == false) {
+                      alert("An error occured.");
+                    }
+                    else {
+                      alert("Successfully posted!");
+                      window.location.href = "http://localhost:3000/profile"
+                    }
+                  }
+                )
               }
           },
           function(response) {
@@ -67,6 +120,9 @@
 </head>
 <body ng-app="myApp">
   	<div ng-app="myApp" ng-controller="InfoController">
+      <a style="float:right"><button ng-click="logOut()">Log Out</button></a>
+      <a style="float:right"><button ng-click="goToHome()">Home</button></a>
+      <a style="float:right"><button ng-click="search()">Search</button></a>
       <table class="table">
       <thead>
         <tr>
@@ -91,9 +147,18 @@
         <tr>
           <td><h3>{{x.content}}</h3></td>
           <td><h6>{{x.postdate}}</h6></td>
+          <td><h6>{{x.authorfname}} {{x.authorminit}} {{x.authorlname}}</h6></td>
+          <td><input type="text" ng-model="comm" placeholder="Add a comment"><button ng-click="addComment(x.postid, comm)">Comment</button></td>
+          <td><button ng-click="showComments(x.postid)" class="btn btn-default">Show Comments</button>
         </tr>
       </tbody>
       </table>
+      <label><h2>Comments</h2></label>
+      <div ng-repeat="y in comments">
+         <p>{{y.postdate | date}} by {{y.commenterfname}} {{y.commenterlname}}</p>
+        <p>{{y.content}}</p>
+        <br>
+      </div>
     </div>
     <div ng-app="myApp" ng-controller="FriendsController">
       <table class="table">

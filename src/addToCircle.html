@@ -49,11 +49,46 @@
                 }
           })
         }
+         $scope.goToProfile = function() {
+            $http.get('http://localhost:3000/goToProfile/').then(
+              function(response) {
+                if (response.data == false) {
+                  alert("An error occured.");
+                }
+                else {
+                  window.location.href = "http://localhost:3000/profile"
+                }
+              }
+            ) 
+          }
+          $scope.logOut = function() {
+            $http.get('http://localhost:3000/logout/').then(
+              function(response) {
+                if (response.data == false) {
+                  alert("An error occured.");
+                }
+                else {
+                  alert("Thank you!");
+                  window.location.href = "http://localhost:3000/"
+                }
+              }
+            ) 
+          }
+          $scope.goToHome = function() {
+            window.location.href = "http://localhost:3000/feeds"
+          }
+          $scope.search = function() {
+            window.location.href = "http://localhost:3000/userSearch"
+           }
     }])
     </script>
 </head>
 <body>
 	<div ng-app="myApp" ng-controller="CircleController">
+      <a style="float:right"><button ng-click="logOut()">Log Out</button></a>
+      <a style="float:right"><button ng-click="goToHome()">Home</button></a>
+      <a style="float:right"><button ng-click="goToProfile()">My Profile</button></a>
+      <a style="float:right"><button ng-click="search()">Search</button></a>
       <label>Enter circle name: </label>
       <input type="text" ng-model="cname">
       <button ng-click="add()">Add To This Circle</button>

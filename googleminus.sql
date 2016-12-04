@@ -15,16 +15,22 @@ CREATE TABLE IF NOT EXISTS userinfo (
 CREATE TABLE IF NOT EXISTS post (
 	postid int(2) NOT NULL AUTO_INCREMENT,
 	authorid int(2) NOT NULL,
+	authorlname varchar(50) NOT NULL,
+	authorfname varchar(50) NOT NULL,
+	authorminit varchar(50) NOT NULL,
 	content varchar(100) NOT NULL,
-	postdate date NOT NULL,
+	postdate timestamp NOT NULL,
 	constraint post_postid_pk primary key(postid)
 );
 
 CREATE TABLE IF NOT EXISTS comment(
 	commentid int(2) NOT NULL AUTO_INCREMENT,
 	content varchar(100) NOT NULL,
-	postdate date NOT NULL,
+	postdate timestamp NOT NULL,
 	commenterid int(2) NOT NULL,
+	commenterlname varchar(50) NOT NULL,
+	commenterfname varchar(50) NOT NULL,
+	commenterminit varchar(50) NOT NULL,
 	postid int(2) NOT NULL,
 	constraint comment_commentid_pk primary key(commentid)
 );

@@ -23,8 +23,14 @@
 		var jsonString = JSON.stringify(userInfo, null, 2);
        	$http.get("http://localhost:3000/signup/" + jsonString)
        	.then(function(response) {
-       		alert(response.data);
-       		window.location.href = "http://localhost:3000/dummySearch";
+       		if (response.data == false) {
+       			alert("Sorry, email address already exists.");
+       			window.location.href = "http://localhost:3000/sign"
+       		}
+       		else {
+       			alert(response.data);
+       			window.location.href = "http://localhost:3000/dummySearch";
+       		}
        	})
        }
     }])
@@ -44,7 +50,7 @@
              }
               else {
                 alert(response.data);
-                window.location.href = "http://localhost:3000/dummySearch";
+                window.location.href = "http://localhost:3000/feeds";
               }
    		})
        }
