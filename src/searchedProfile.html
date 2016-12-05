@@ -38,9 +38,18 @@
               }
               $scope.search = function() {
                 window.location.href = "http://localhost:3000/userSearch"
-              }
-              $scope.viewCircles = function() {
-                window.location.href = "http://localhost:3000/profile/viewCircles"  
+             }
+             $scope.goToProfile = function() {
+                $http.get('http://localhost:3000/goToProfile/').then(
+                  function(response) {
+                    if (response.data == false) {
+                      alert("An error occured.");
+                    }
+                    else {
+                      window.location.href = "http://localhost:3000/profile"
+                    }
+                  }
+                ) 
               }
 	        },
 	        function(response) {
@@ -89,7 +98,7 @@
                     }
                     else {
                       alert("Successfully posted!");
-                      window.location.href = "http://localhost:3000/profile"
+                      window.location.href = "http://localhost:3000/searchedProfile"
                     }
                   }
                 )
@@ -105,50 +114,11 @@
                       alert("An error occured.");
                     }
                     else {
-                      window.location.href = "http://localhost:3000/profile"
+                      window.location.href = "http://localhost:3000/searchedProfile"
                     }
                   }
                 )
               }
-              $scope.edit = function(postID, oldContent) {
-                var newContent = prompt("Edit post", oldContent);
-                if (newContent != null) {
-                  var editInfo = {
-                   postid: postID,
-                   content: newContent
-                  }
-                  var jsonString = JSON.stringify(editInfo, null, 2);
-                  $http.get('http://localhost:3000/edit/'+jsonString).then(
-                    function(response) {
-                      if (response.data == false) {
-                        alert("An error occured.");
-                      }
-                      else {
-                        window.location.href = "http://localhost:3000/profile"
-                      }
-                    }
-                  )
-                }
-              }
-              $scope.delete = function(postID) {
-                var doDelete = confirm("Are you sure you want to delete this post?");
-                if (doDelete == true) {
-                  var deleteInfo = {
-                   postid: postID
-                  }
-                  var jsonString = JSON.stringify(deleteInfo, null, 2);
-                  $http.get('http://localhost:3000/delete/'+jsonString).then(
-                    function(response) {
-                      if (response.data == false) {
-                        alert("An error occured.");
-                      }
-                      else {
-                        window.location.href = "http://localhost:3000/profile"
-                      }
-                    }
-                  )
-                }
-              } 
           },
           function(response) {
             //Second function handles error
@@ -180,8 +150,8 @@
   	<div ng-app="myApp" ng-controller="InfoController">
       <a style="float:right"><button ng-click="logOut()">Log Out</button></a>
       <a style="float:right"><button ng-click="goToHome()">Home</button></a>
-      <a style="float:right"><button ng-click="viewCircles()">Circles</button></a>
       <a style="float:right"><button ng-click="search()">Search</button></a>
+      <a style="float:right"><button ng-click="goToProfile()">My Profile</button></a>
       <table class="table">
       <thead>
         <tr>
@@ -211,8 +181,6 @@
           <td><button ng-click="like(x.postid)" class="btn btn-default">+1</button></td>
           <td><input type="text" ng-model="comm" placeholder="Add a comment"><button ng-click="addComment(x.postid, comm)">Comment</button></td>
           <td><button ng-click="showComments(x.postid)" class="btn btn-default">Show Comments</button>
-          <td><button ng-click="edit(x.postid, x.content)" class="btn btn-default">Edit</button></td>
-          <td><button ng-click="delete(x.postid)" class="btn btn-default">Delete</button></td>
         </tr>
       </tbody>
       </table>
@@ -237,5 +205,6 @@
       </tbody> 
       </table>
     </div>
+      <a href="http://localhost:3000/addToCircle"><button>Add To Circle</button></a>
 </body>
 </html>

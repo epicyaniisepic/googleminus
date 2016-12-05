@@ -145,10 +145,119 @@ app.get('/searchUser/:data', function(req,res) {
 	})
 })
 
+app.get('/searchedProfile',function(req,res) {
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			res.sendFile(path.join(__dirname + '/src/searchedProfile.html'));
+		}
+		else {
+			res.send("Access Denied. Please log in.");
+			currentUser = null;
+		}
+	})
+})
+
 app.get('/profile',function(req,res) {
 	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
 		if (rows.length != 0) {
 			res.sendFile(path.join(__dirname + '/src/profile.html'));
+		}
+		else {
+			res.send("Access Denied. Please log in.");
+			currentUser = null;
+		}
+	})
+})
+
+app.get('/profile/viewCircles',function(req,res) {
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			res.sendFile(path.join(__dirname + '/src/circles.html'));
+		}
+		else {
+			res.send("Access Denied. Please log in.");
+			currentUser = null;
+		}
+	})
+})
+
+app.get('/profile/circles/:cir',function(req,res) {
+	var circleInfo = JSON.parse(req.params.cir);
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			connection.query('select lastname, firstname, middleinit, userinfo.userid, circlename from userinfo, circle where userinfo.userid = circle.friendid and circlename = ? and circle.userid = ?',[circleInfo.circlename, currentUser.userid],function(err,rows,fields) {
+				if (!err) {
+					if (rows.length != 0) {
+						res.send(rows);
+					}
+					else {
+						res.send(0);
+					}
+				}
+				else {
+					res.send(false);
+				}
+			})
+		}
+		else {
+			res.send("Access Denied. Please log in.");
+			currentUser = null;
+		}
+	})
+})
+
+app.get('/profile/circles/rename/:new',function(req,res) {
+	var circleInfo = JSON.parse(req.params.new);
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			connection.query('update circle set circlename = ? where circlename = ? and userid = ?',[circleInfo.circlename,circleInfo.oldName,currentUser.userid],function(err,rows,fields) {
+				if (!err) {
+					res.send("OK");
+				}
+				else {
+					res.send(false);
+				}
+			})
+		}
+		else {
+			res.send("Access Denied. Please log in.");
+			currentUser = null;
+		}
+	})
+})
+
+app.get('/profile/circles/removeMember/:member',function(req,res) {
+	var memberInfo = JSON.parse(req.params.member);
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			connection.query('delete from circle where friendid = ? and circlename = ? and userid = ?',[memberInfo.userid,memberInfo.circlename,currentUser.userid],function(err,rows,fields) {
+				if (!err) {
+					res.send("OK");
+				}
+				else {
+					res.send(false);
+				}
+			})
+		}
+		else {
+			res.send("Access Denied. Please log in.");
+			currentUser = null;
+		}
+	})
+})
+
+app.get('/profile/circles/delete/:new',function(req,res) {
+	var circleInfo = JSON.parse(req.params.new);
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			connection.query('delete from circle where circlename = ? and userid = ?',[circleInfo.circlename,currentUser.userid],function(err,rows,fields) {
+				if (!err) {
+					res.send("OK");
+				}
+				else {
+					res.send(false);
+				}
+			})
 		}
 		else {
 			res.send("Access Denied. Please log in.");
@@ -299,12 +408,30 @@ app.get('/like/:id',function(req,res) {
 	var pid = JSON.parse(req.params.id);
 	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
 		if (rows.length != 0) {
-			connection.query('update post set likes = likes + 1 where postid = ?',[pid.postid],function(err,rows,fields){
-				if (!err) {
-					res.send('OK');
+			connection.query("select * from likeinfo where postid = ? and likerid = ?",[pid.postid,currentUser.userid],function(err,rows,fields) {
+				if (rows.length == 0) {
+					connection.query('insert into likeinfo(likerid,postid) values (?,?)',[currentUser.userid,pid.postid],function(err,rows,fields) {
+					})
+					connection.query('update post set likes = likes + 1 where postid = ?',[pid.postid],function(err,rows,fields){
+						if (!err) {
+							res.send('OK');
+						}
+						else {
+							res.send(false);
+						}
+					})		
 				}
 				else {
-					res.send(false);
+					connection.query('delete from likeinfo where postid = ? and likerid = ?',[pid.postid,currentUser.userid],function(err,rows,fields) {
+					})
+					connection.query('update post set likes = likes - 1 where postid = ?',[pid.postid],function(err,rows,fields){
+						if (!err) {
+							res.send('OK');
+						}
+						else {
+							res.send(false);
+						}
+					})
 				}
 			})
 		}
@@ -453,7 +580,7 @@ app.get('/addToCircle/:circlename', function(req,res) {
 app.get('/getCircles', function(req,res) {
 	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
 		if (rows.length != 0) {
-			connection.query('select distinct circlename from circle where userid = ?',currentUser.userid,function(err,rows,fields) {
+			connection.query('select circlename, count(*) as "numOfMembers" from circle where userid = ? group by circlename',currentUser.userid,function(err,rows,fields) {
 				if (!err) {
 					console.log(rows);
 					if (rows.length == 0) {

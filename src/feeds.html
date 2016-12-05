@@ -30,6 +30,7 @@
 		          		function(response) {
 		          			if (response.data == false) {
 			                	alert("No comments.");
+			                	$scope.comments = null;
 			              	}
 			              	else {
 			              		$scope.comments = response.data;
@@ -138,7 +139,7 @@
        <tbody ng-repeat = "x in posts">
         <tr>
           <td><h3>{{x.content}}</h3></td>
-          <td><h6>{{x.postdate}}</h6></td>
+          <td><h6>{{x.postdate | date}}</h6></td>
           <td><h6>{{x.authorfname}} {{x.authorminit}} {{x.authorlname}}</h6></td>
           <td><h6>Likes: {{x.likes}}</h6></td>
           <td><button ng-click="like(x.postid)" class="btn btn-default">+1</button></td>

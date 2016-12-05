@@ -1,87 +1,198 @@
 <!DOCTYPE html>
 <html ng-app="myApp">
 <head>
-  <title>Poodle Plus</title>
+  <title>Poodle Plus Login</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="http://localhost:3000/external/bootstrap.min.css">
+
   <script src="http://localhost:3000/external/jquery.min.js"></script>
   <script src="http://localhost:3000/external/bootstrap.min.js"></script>
   <script src="http://localhost:3000/external/angular.min.js"></script>
+  <script src="http://localhost:3000/external/js/materialize.min.js"></script>
+  <link rel="stylesheet" href="http://localhost:3000/external/css/materialize.min.css">
+
+  <style>
+    h1{
+      text-align: left;
+      text-shadow: 2px 4px 2px white;
+      font-family: Georgia;
+      font-style: bold;
+      font-size: 70px     ;
+    }
+    body{
+      background-image: url("http://localhost:3000/external/947334-poodle-wallpaper.jpeg");
+      max-width:100%;
+      height: 100%;
+    }
+    textarea:focus{
+      border-bottom: 1px solid orange;
+      -webkit-box-shadow: 0 1px 0 0 orange;
+      -moz-box-shadow: 0 1px 0 0 orange;
+      box-shadow: 0 1px 0 0 orange;
+    }
+    
+
+
+    div.radi{
+      border-radius:5px;
+    }
+  </style>
+
   <script>
      var myApp = angular.module('myApp', [])
    
- 	 myApp.controller('SignUpController', ['$scope', '$http', function($scope, $http) {
+   myApp.controller('SignUpController', ['$scope', '$http', function($scope, $http) {
        $scope.signup = function(uEmail, uLname, uFname, uMinit, uPword) {
-       	var userInfo = {
-			email: uEmail,
-			lastname: uLname,
-			firstname: uFname,
-			middleinit: uMinit,
-			password: uPword
-		};
-		var jsonString = JSON.stringify(userInfo, null, 2);
-       	$http.get("http://localhost:3000/signup/" + jsonString)
-       	.then(function(response) {
-       		if (response.data == false) {
-       			alert("Sorry, email address already exists.");
-       			window.location.href = "http://localhost:3000/sign"
-       		}
-       		else {
-       			alert(response.data);
-       			window.location.href = "http://localhost:3000/feeds";
-       		}
-       	})
+        var userInfo = {
+        email: uEmail,
+        lastname: uLname,
+        firstname: uFname,
+        middleinit: uMinit,
+        password: uPword
+    };
+    var jsonString = JSON.stringify(userInfo, null, 2);
+        $http.get("http://localhost:3000/signup/" + jsonString)
+        .then(function(response) {
+          if (response.data != false) {
+            Materialize.toast(response.data, 1000);
+            function shift(){
+                window.location.href = "http://localhost:3000/feeds";
+            }
+            setTimeout(shift, 400);
+          }
+          else {
+            Materialize.toast("Sorry, email address already exists.", 3000);
+          }
+        })
        }
     }])
 
- 	 myApp.controller('SignInController', ['$scope', '$http', function($scope, $http) {
+   myApp.controller('SignInController', ['$scope', '$http', function($scope, $http) {
        $scope.signin = function(uEmail, uPword) {
-       	var userInfo = {
-			email: uEmail,
-			password: uPword
-		};
-		var jsonString = JSON.stringify(userInfo, null, 2);
-       	$http.get("http://localhost:3000/signin/" + jsonString)
-       	.then(function(response) {
-       		if (response.data == false) {
-                alert("User not found.");
-                window.location.href = "http://localhost:3000/sign";
+        var userInfo = {
+      email: uEmail,
+      password: uPword
+    };
+    var jsonString = JSON.stringify(userInfo, null, 2);
+        $http.get("http://localhost:3000/signin/" + jsonString)
+        .then(function(response) {
+          if (response.data == false) {
+                Materialize.toast("User not found.", 3000);
              }
               else {
-                alert(response.data);
-                window.location.href = "http://localhost:3000/feeds";
+                Materialize.toast(response.data, 1000);
+                function shift(){
+                  window.location.href = "http://localhost:3000/feeds";
+                }
+                setTimeout(shift, 1000);
               }
-   		})
+      })
        }
     }])
 
 
   </script>
 </head>
-<body>
-	<h1>Google Minus</h1><br>
-	<h2>Sign Up</h2><br><br>
-	<div ng-app="myApp" ng-controller="SignUpController">
-		<label>Email: </label>
-		<input type="text" ng-model="email" placeholder="Enter email"><br>
-		<label>Last Name: </label>
-		<input type="text" ng-model="lname" placeholder="Enter last name">
-		<label>First Name: </label>
-		<input type="text" ng-model="fname" placeholder="Enter first name">
-		<label>Middle Initial: </label>
-		<input type="text" ng-model="minit" placeholder="Enter middle initial"><br>
-		<label>Password: </label>
-		<input type="password" ng-model="pword" placeholder="Enter password"><br><br>
-		<button ng-click="signup(email,lname,fname,minit,pword)">Register</button>
-	</div>
-	<br><br>
-	<h2>Sign In</h2><br><br>
-	<div ng-app="myApp" ng-controller="SignInController">
-		<label>Email: </label>
-		<input type="text" ng-model="email2" placeholder="Enter email"><br>
-		<label>Password: </label>
-		<input type="password" ng-model="pword2" placeholder="Enter password"><br><br>
-		<button ng-click="signin(email2,pword2)">Sign in</button>
-	</div>
+<body class="deep-purple lighten-5">
+        <nav class="red accent-4 darken-3" style="opacity:.9;">
+            <div class="container">
+                <div class="nav-wrapper">
+                    <div class="brand-logo left"><span class="black-text" >poodle</span><span class="white-text">plus</span></a></div>
+
+                    <div class="row hide-on-small-only" ng-app="myApp" ng-controller="SignInController">
+                        <form class="right col l6">
+                            <div class="row">
+                                <div class="input-field col s5 black-text">
+                                    <input ng-model="email2" type="text" placeholder="Email" style="padding-left: 0px;" class="black-text">
+                                </div>
+                                <div class="input-field col s5">
+                                    <input ng-model="pword2" type="password" placeholder="Password" style="padding-left: 0px;">
+                                </div>
+                                <div class="input-field col s2">
+                                    <button ng-click="signin(email2,pword2)" class="btn brown white-text waves-effect waves-light">
+                                        Login
+                                    </button>
+                                </div>                               
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="row">
+                <div class="col l8 m8 s12">
+                    <div class="centerbar">
+                        <div class="row">
+                            <div id="search-div" class="col s11 radi">
+                              <h1 class="red-text text-accent-4">Welcome to Poodle Plus!</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col l4 m4 s12">
+                    <div ng-app="myApp" ng-controller="SignUpController" class="row hide-on-small-only red darken-4 radi">
+                    <br>
+                      <h5 style="margin:0;text-align:center;" class="white-text">Sign Up</h5>
+                      <br>
+                      <div class="card orange lighten-5">
+                        <div class="card-content">
+                          <div class="row">
+                            <form class="col s12">
+                            <div class="row" style="margin-bottom: 0px;">
+                              <div class="input-field col s12">
+                                <input ng-model="email" type="text" style="margin-bottom: 0px;">
+                                <label>Email</label>
+                              </div>
+                            </div>
+                            <div class="row" style="margin-bottom: 0px;">
+                              <div class="input-field col s12">
+                              <input ng-model="fname" type="text" style="margin-bottom: 0px;">
+                              <label>First Name</label>
+                            </div>
+                          </div>
+                          <div class="row" style="margin-bottom: 0px;">
+                            <div class="input-field col s12">
+                              <input ng-model="lname" type="text" style="margin-bottom: 0px;">
+                              <label>Last Name</label>
+                            </div>
+                          </div>
+                          <div class="row" style="margin-bottom: 0px;">
+                            <div class="input-field col s12">
+                              <input ng-model="minit" type="text" style="margin-bottom: 0px;">
+                              <label>Middle Initial</label>
+                            </div>
+                          </div>
+                          <div class="row" style="margin-bottom: 0px;">
+                            <div class="input-field col s12">
+                              <input ng-model="pword" type="password" style="margin-bottom: 0px;">
+                              <label>Password</label>
+                            </div>
+                          </div>
+                          <div class="row" style="margin-bottom: 0px;">
+                            <div class="input-field col s4">
+                              <button  class="center btn brown waves-effect waves-light" type="submit" ng-click="signup(email,lname,fname,minit,pword)">REGISTER</button>
+                            </div>
+                        </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="no-print">
+            <div class="footer-copyright">
+                <div class="container">
+                    <span class="left">@ 2016. CMSC 100 Project, Poodle Plus</span>
+                </div>
+            </div>
+        </footer>
+
+<div class="hiddendiv common"></div>
+</body>
 </html>
