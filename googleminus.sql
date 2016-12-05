@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS post (
 	authorminit varchar(50) NOT NULL,
 	content varchar(100) NOT NULL,
 	postdate timestamp NOT NULL,
+	likes int(5) default 0,
 	constraint post_postid_pk primary key(postid)
 );
 

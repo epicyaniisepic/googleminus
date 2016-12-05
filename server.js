@@ -275,11 +275,18 @@ app.get('/addComment/:comm', function(req,res) {
 app.get('/getCirclePosts',function(req, res) {
 	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
 		if (rows.length != 0) {
-			connection.query('select distinct postid, authorid, authorlname, authorminit, content, postdate from post join circle on post.authorid = circle.friendid or post.authorid = ? where circle.userid = ? or post.authorid = ? order by postid desc',[currentUser.userid,currentUser.userid,currentUser.userid],function(err,rows,fields) {
+			connection.query('select distinct postid, authorid, authorlname, authorminit, content, postdate, likes from post join circle on post.authorid = circle.friendid or post.authorid = ? where circle.userid = ? or post.authorid = ? order by postid desc',[currentUser.userid,currentUser.userid,currentUser.userid],function(err,rows,fields) {
 				if (!err) {
 					if (rows.length == 0) {
-						console.log("No posts.");
-						res.send(true);
+						connection.query('select * from post where authorid = ?',[currentUser.userid],function(err, rows, fields) {
+							if (rows.length == 0) {
+								console.log("No posts.");
+								res.send(true);
+							}
+							else {
+								res.send(rows);
+							}
+						})
 					}
 					else {
 						res.send(rows);
@@ -292,6 +299,73 @@ app.get('/getCirclePosts',function(req, res) {
 			currentUser = null;
 			res.send(false);
 			//access denied, please sign in
+		}
+	})
+})
+
+app.get('/like/:id',function(req,res) {
+	var pid = JSON.parse(req.params.id);
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			connection.query('update post set likes = likes + 1 where postid = ?',[pid.postid],function(err,rows,fields){
+				if (!err) {
+					res.send('OK');
+				}
+				else {
+					res.send(false);
+				}
+			})
+		}
+		else {
+			res.send("Access Denied. Please log in.");
+			currentUser = null;
+		}
+	})
+})
+
+app.get('/edit/:info',function(req,res) {
+	var editInfo = JSON.parse(req.params.info);
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			connection.query('update post set content = ? where postid = ?',[editInfo.content,editInfo.postid],function(err,rows,fields){
+				if (!err) {
+					res.send('OK');
+				}
+				else {
+					res.send(false);
+				}
+			})
+		}
+		else {
+			res.send("Access Denied. Please log in.");
+			currentUser = null;
+		}
+	})
+})
+
+app.get('/delete/:id',function(req,res) {
+	var deleteInfo = JSON.parse(req.params.id);
+	connection.query('select * from userinfo where token = ?',token,function(err, rows, fields) {
+		if (rows.length != 0) {
+			connection.query('delete from post where postid = ?',[deleteInfo.postid],function(err,rows,fields){
+				if (!err) {
+					connection.query('delete from comment where postid = ?',[deleteInfo.postid],function(err,rows,fields){
+						if (!err) {
+							res.send("OK");
+						}
+						else {
+							res.send(false);
+						}
+					})
+				}
+				else {
+					res.send(false);
+				}
+			})
+		}
+		else {
+			res.send("Access Denied. Please log in.");
+			currentUser = null;
 		}
 	})
 })

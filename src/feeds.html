@@ -54,6 +54,22 @@
 		          		}
 		          	)
 		          }
+		          $scope.like = function(postID) {
+		          	var likeInfo = {
+		          		postid: postID
+		          	}
+		          	var jsonString = JSON.stringify(likeInfo, null, 2);
+		          	$http.get('http://localhost:3000/like/'+jsonString).then(
+		          		function(response) {
+		          			if (response.data == false) {
+		          				alert("An error occured.");
+		          			}
+		          			else {
+		          				window.location.href = "http://localhost:3000/feeds"
+		          			}
+		          		}
+		          	)
+		          }
 		          $scope.addComment = function(postID, comment) {
 		          	var ownComment = {
 		          		postid: postID,
@@ -124,8 +140,10 @@
           <td><h3>{{x.content}}</h3></td>
           <td><h6>{{x.postdate}}</h6></td>
           <td><h6>{{x.authorfname}} {{x.authorminit}} {{x.authorlname}}</h6></td>
+          <td><h6>Likes: {{x.likes}}</h6></td>
+          <td><button ng-click="like(x.postid)" class="btn btn-default">+1</button></td>
           <td><input type="text" ng-model="comm" placeholder="Add a comment"><button ng-click="addComment(x.postid, comm)">Comment</button></td>
-          <td><button ng-click="showComments(x.postid)" class="btn btn-default">Show Comments</button>
+          <td><button ng-click="showComments(x.postid)" class="btn btn-default">Show Comments</button></td>
         </tr>
       </tbody>
       </table>
