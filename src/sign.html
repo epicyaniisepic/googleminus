@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html ng-app="myApp">
 <head>
-  <title>Google Minus</title>
+  <title>Poodle Minus</title>
   <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="http://localhost:3000/external/bootstrap.min.css">
   <script src="http://localhost:3000/external/jquery.min.js"></script>
   <script src="http://localhost:3000/external/bootstrap.min.js"></script>
   <script src="http://localhost:3000/external/angular.min.js"></script>
   <script>
-     var myApp = angular.module('myApp', [])
+    var myApp = angular.module('myApp', [])
    
- 	 myApp.controller('SignUpController', ['$scope', '$http', function($scope, $http) {
+ 	  myApp.controller('SignUpController', ['$scope', '$http', function($scope, $http) {
        $scope.signup = function(uEmail, uLname, uFname, uMinit, uPword) {
        	var userInfo = {
 			email: uEmail,
