@@ -13,13 +13,13 @@
   <link rel="stylesheet" href="http://localhost:3000/external/css/materialize.min.css">
 
   <style>
-  	h1{
-  		text-align: left;
+    h1{
+      text-align: left;
       text-shadow: 2px 4px 2px white;
       font-family: Georgia;
       font-style: bold;
       font-size: 70px     ;
-  	}
+    }
     body{
       background-image: url("http://localhost:3000/external/947334-poodle-wallpaper.jpeg");
       max-width:100%;
@@ -42,37 +42,37 @@
   <script>
      var myApp = angular.module('myApp', [])
    
- 	 myApp.controller('SignUpController', ['$scope', '$http', function($scope, $http) {
+   myApp.controller('SignUpController', ['$scope', '$http', function($scope, $http) {
        $scope.signup = function(uEmail, uLname, uFname, uMinit, uPword) {
-       	var userInfo = {
-			email: uEmail,
-			lastname: uLname,
-			firstname: uFname,
-			middleinit: uMinit,
-			password: uPword
-		};
-		var jsonString = JSON.stringify(userInfo, null, 2);
-       	$http.get("http://localhost:3000/signup/" + jsonString)
-       	.then(function(response) {
-       		Materialize.toast(response.data, 1000);
+        var userInfo = {
+      email: uEmail,
+      lastname: uLname,
+      firstname: uFname,
+      middleinit: uMinit,
+      password: uPword
+    };
+    var jsonString = JSON.stringify(userInfo, null, 2);
+        $http.get("http://localhost:3000/signup/" + jsonString)
+        .then(function(response) {
+          Materialize.toast(response.data, 1000);
           function shift(){
               window.location.href = "http://localhost:3000/feeds";
           }
           setTimeout(shift, 400);
-       	})
+        })
        }
     }])
 
- 	 myApp.controller('SignInController', ['$scope', '$http', function($scope, $http) {
+   myApp.controller('SignInController', ['$scope', '$http', function($scope, $http) {
        $scope.signin = function(uEmail, uPword) {
-       	var userInfo = {
-			email: uEmail,
-			password: uPword
-		};
-		var jsonString = JSON.stringify(userInfo, null, 2);
-       	$http.get("http://localhost:3000/signin/" + jsonString)
-       	.then(function(response) {
-       		if (response.data == false) {
+        var userInfo = {
+      email: uEmail,
+      password: uPword
+    };
+    var jsonString = JSON.stringify(userInfo, null, 2);
+        $http.get("http://localhost:3000/signin/" + jsonString)
+        .then(function(response) {
+          if (response.data == false) {
                 Materialize.toast("User not found.", 3000);
              }
               else {
@@ -82,7 +82,7 @@
                 }
                 setTimeout(shift, 1000);
               }
-   		})
+      })
        }
     }])
 
@@ -90,36 +90,36 @@
   </script>
 </head>
 <!--body class="red accent-4">
-	<div class="red accent-4 white-text"><h1> * ~ * ~ Welcome to Poodle Plus!!! ~ * ~ * </h1></div>
-	<div class="grey lighten-1">
-	<div ng-app="myApp" ng-controller="SignUpController">
-		<div class="row">
+  <div class="red accent-4 white-text"><h1> * ~ * ~ Welcome to Poodle Plus!!! ~ * ~ * </h1></div>
+  <div class="grey lighten-1">
+  <div ng-app="myApp" ng-controller="SignUpController">
+    <div class="row">
         <div class="col s12 m6">
           <div class="card red accent-4">
           <h3 class="white-text">Sign Up</h3>
             <div class="card-content white black-text">
-            	<div class="input-field row red-accent">
-					<label>Email: </label>
-					<input type="text" ng-model="email">
-				</div>
+              <div class="input-field row red-accent">
+          <label>Email: </label>
+          <input type="text" ng-model="email">
+        </div>
 
-				<div class="input-field row">
-					<label>Last Name: </label>
-					<input type="text" ng-model="lname">
-				</div>
-				<div class="input-field row">
-					<label>First Name: </label>
-					<input type="text" ng-model="fname">
-				</div>
-				<div class="input-field row">
-					<label>Middle Initial: </label>
-					<input type="text" ng-model="minit">
-				</div>
-				<div class="input-field row">
-					<label>Password: </label>
-					<input type="password" ng-model="pword">
-				</div>
-					
+        <div class="input-field row">
+          <label>Last Name: </label>
+          <input type="text" ng-model="lname">
+        </div>
+        <div class="input-field row">
+          <label>First Name: </label>
+          <input type="text" ng-model="fname">
+        </div>
+        <div class="input-field row">
+          <label>Middle Initial: </label>
+          <input type="text" ng-model="minit">
+        </div>
+        <div class="input-field row">
+          <label>Password: </label>
+          <input type="password" ng-model="pword">
+        </div>
+          
             </div>
             <div class="card-action">
               <button ng-click="signup(email,lname,fname,minit,pword)" class="btn amber waves-effect waves-light black-text">Register</button>  
@@ -127,31 +127,31 @@
           </div>
         </div>
       </div>
-	</div>
-	<br><br>
-	<div ng-app="myApp" ng-controller="SignInController">
-		<div class="row">
+  </div>
+  <br><br>
+  <div ng-app="myApp" ng-controller="SignInController">
+    <div class="row">
         <div class="col s12 m6">
           <div class="card red accent-4">
           <h3 class="">Sign In</h3>
             <div class="card-content white black-text">
-        		<div class="input-field">
-				<label>Email: </label>
-				<input type="text" ng-model="email2" placeholder="Enter email">
-				</div>
-				<div class="input-field">
-				<label>Password: </label>
-				<input type="password" ng-model="pword2" placeholder="Enter password">
-				</div>   	
+            <div class="input-field">
+        <label>Email: </label>
+        <input type="text" ng-model="email2" placeholder="Enter email">
+        </div>
+        <div class="input-field">
+        <label>Password: </label>
+        <input type="password" ng-model="pword2" placeholder="Enter password">
+        </div>    
             </div>
             <div class="card-action">
-            	<button ng-click="signin(email2,pword2)" class="btn amber waves-effect waves-light black-text">Sign in</button>  
+              <button ng-click="signin(email2,pword2)" class="btn amber waves-effect waves-light black-text">Sign in</button>  
             </div>
           </div>
         </div>
       </div>
-	</div>
-	</div>
+  </div>
+  </div>
   </body-->
 
 <body class="deep-purple lighten-5">
@@ -210,13 +210,13 @@
                             </div>
                             <div class="row" style="margin-bottom: 0px;">
                               <div class="input-field col s12">
-                              <input ng-model="fname" type="password" style="margin-bottom: 0px;">
+                              <input ng-model="fname" type="text" style="margin-bottom: 0px;">
                               <label>First Name</label>
                             </div>
                           </div>
                           <div class="row" style="margin-bottom: 0px;">
                             <div class="input-field col s12">
-                              <input ng-model="pword" type="password" style="margin-bottom: 0px;">
+                              <input ng-model="lname" type="text" style="margin-bottom: 0px;">
                               <label>Last Name</label>
                             </div>
                           </div>
@@ -228,7 +228,7 @@
                           </div>
                           <div class="row" style="margin-bottom: 0px;">
                             <div class="input-field col s12">
-                              <input ng-model="pword" type="email" style="margin-bottom: 0px;">
+                              <input ng-model="pword" type="password" style="margin-bottom: 0px;">
                               <label>Password</label>
                             </div>
                           </div>
