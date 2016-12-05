@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+  <title>View Users</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://localhost:3000/external/bootstrap.min.css">
+  <script src="http://localhost:3000/external/jquery.min.js"></script>
+  <script src="http://localhost:3000/external/bootstrap.min.js"></script>
+  <script src="http://localhost:3000/external/angular.min.js"></script>
+  <script>
+    var myApp = angular.module('myApp', [])
+   
+  	myApp.controller('RetrieveController', ['$scope', '$http', function($scope, $http) {
+       $http.get('http://localhost:3000/viewUsers/data').then(
+        function(response) {
+          //First function handles success
+          $scope.users = response.data;
+          console.log($scope.users)
+        },
+        function(response) {
+          //Second function handles error
+          alert('Sorry, Could not find data!')
+        }
+
+      )
+    }])
+   </script>
+   <style>
+      #homecontainer{
+         width: 100%;
+         height: 100px;
+         padding: 30px 20px;
+      }
+    </style>
+</head>
+<body>
+	<div id = "homecontainer" class="container">
+      <h2>View Users</h2>
+    </div><br>
+  	<div ng-app="myApp" ng-controller="RetrieveController">
+      <table class="table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Last Name</th>
+          <th>First Name</th>
+          <th>Middle Initial</th>
+          <th>Password</th>
+        </tr>
+      </thead>
+      <tbody ng-repeat = "x in users">
+        <tr>
+          <td>{{x.email}}</td>
+          <td>{{x.lastname}}</td>
+          <td>{{x.firstname}}</td>
+          <td>{{x.middleinit}}</td>
+          <td>{{x.password}}</td>
+        </tr>
+      </tbody>
+	</div>
+</body>
+</html>
