@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+  <title>Search</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="external/bootstrap.min.css">
+  <script src="http://localhost:3000/external/jquery.min.js"></script>
+  <script src="http://localhost:3000/external/bootstrap.min.js"></script>
+  <script src="http://localhost:3000/external/angular.min.js"></script>
+  <script>
+    //Put your scripts here
+    var myApp = angular.module('myApp', [])
+   
+    myApp.controller('SearchController', ['$scope', '$http', function($scope, $http) {
+       $http.get('http://localhost:3000/search').then(
+        function(response) {
+          if (response.data == false) {
+            alert("Access Denied. Please log in.");
+            window.location.href = "http://localhost:3000/sign";
+          }
+          $scope.search = function(fname, minit, lname){
+            var userInfo = {
+              firstname: fname,
+              middleinit: minit,
+              lastname: lname
+          }
+          var jsonString = JSON.stringify(userInfo, null, 2);
+          $http.get('http://localhost:3000/searchUser/'+jsonString).then(
+            function(response){
+              if (response.data == false) {
+                alert("User not found.");
+                window.location.href = "http://localhost:3000/userSearch";
+              }
+              else if (response.data == 0) {
+                alert("Access Denied. Please log in.");
+                window.location.href = "http://localhost:3000/";     
+              }
+              else {
+                alert(response.data);
+                window.location.href = "http://localhost:3000/profile";
+              }
+            },
+            function(response) {
+              alert("Error");
+            }
+          )
+          }
+        },
+        function(response) {
+          //Second function handles error
+          alert('Sorry, Could not find data!')
+        }
+
+      )
+    }])
+  </script>
+  <style>
+      #homecontainer{
+         width: 100%;
+         height: 100px;
+         padding: 30px 20px;
+      }
+    </style>
+</head>
+<body>
+  
+    <div id = "homecontainer" class="container">
+      <h2>Search</h2>
+    </div><br>
+    <div ng-app="myApp" ng-controller="SearchController" >
+      <label>&nbsp &nbsp&nbsp&nbspEnter first name: </label>
+      <input type="text" ng-model="fname" ng-init="fname=' '">
+      <label>&nbsp &nbsp&nbsp&nbspEnter middle initial: </label>
+      <input type="text" ng-model="minit" ng-init="minit=' '">
+      <label>&nbsp &nbsp&nbsp&nbspEnter last name: </label>
+      <input type="text" ng-model="lname" ng-init="lname=' '"> 
+      <button ng-click="search(fname, minit, lname)" class="btn btn-default">Search</button><br><br>
+    </div>
+</body>
+</html>
+
+  

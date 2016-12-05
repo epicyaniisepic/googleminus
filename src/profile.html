@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+	<title>User Profile</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="http://localhost:3000/external/bootstrap.min.css">
+	<script src="http://localhost:3000/external/jquery.min.js"></script>
+	<script src="http://localhost:3000/external/bootstrap.min.js"></script>
+	<script src="http://localhost:3000/external/angular.min.js"></script>
+	<script>
+		var myApp = angular.module('myApp', [])
+   
+  		myApp.controller('InfoController', ['$scope', '$http', function($scope, $http) {
+       		$http.get('http://localhost:3000/getInfo').then(
+        	function(response) {
+          	//First function handles success
+              if (response.data == false) {
+                alert("Access Denied. Please log in");
+                window.location.href = "http://localhost:3000/";
+              }
+	          	$scope.info = response.data;
+              $scope.goToHome = function() {
+                window.location.href = "http://localhost:3000/feeds"
+              }
+              $scope.logOut = function() {
+                $http.get('http://localhost:3000/logout/').then(
+                  function(response) {
+                    if (response.data == false) {
+                      alert("An error occured.");
+                    }
+                    else {
+                      alert("Thank you!");
+                      window.location.href = "http://localhost:3000/"
+                    }
+                  }
+                ) 
+              }
+              $scope.search = function() {
+                window.location.href = "http://localhost:3000/userSearch"
+             }
+	        },
+	        function(response) {
+	          //Second function handles error
+	          alert('Sorry, Could not find data!')
+	        }
+      )
+    }])
+      myApp.controller('PostController', ['$scope', '$http', function($scope, $http) {
+          $http.get('http://localhost:3000/getPosts').then(
+          function(response) {
+            //First function handles success
+              if (response.data == false) {
+                alert("Access Denied. Please log in");
+                window.location.href = "http://localhost:3000/";
+              }
+              else {
+                $scope.posts = response.data;
+              }
+               $scope.showComments = function(postID){
+                var posts = {
+                  postid: postID
+                }
+                var jsonString = JSON.stringify(posts, null, 2);
+                $http.get('http://localhost:3000/loadComments/'+jsonString).then(
+                  function(response) {
+                    if (response.data == false) {
+                        alert("No comments.");
+                      }
+                      else {
+                        $scope.comments = response.data;
+                      }
+                  }
+                )
+              }
+              $scope.addComment = function(postID, comment) {
+                var ownComment = {
+                  postid: postID,
+                  content: comment
+                }
+                var jsonString = JSON.stringify(ownComment, null, 2);
+                $http.get('http://localhost:3000/addComment/'+jsonString).then(
+                  function(response) {
+                    if (response.data == false) {
+                      alert("An error occured.");
+                    }
+                    else {
+                      alert("Successfully posted!");
+                      window.location.href = "http://localhost:3000/profile"
+                    }
+                  }
+                )
+              }
+          },
+          function(response) {
+            //Second function handles error
+            alert('Sorry, Could not find data!')
+          }
+      )
+    }])
+       myApp.controller('FriendsController', ['$scope', '$http', function($scope, $http) {
+          $http.get('http://localhost:3000/getFriends').then(
+          function(response) {
+            //First function handles success
+              if (response.data == false) {
+                alert("Access Denied. Please log in");
+                window.location.href = "http://localhost:3000/";
+              }
+              else {
+                $scope.friends = response.data;
+              }
+          },
+          function(response) {
+            //Second function handles error
+            alert('Sorry, Could not find data!')
+          }
+      )
+    }])
+	</script>
+</head>
+<body ng-app="myApp">
+  	<div ng-app="myApp" ng-controller="InfoController">
+      <a style="float:right"><button ng-click="logOut()">Log Out</button></a>
+      <a style="float:right"><button ng-click="goToHome()">Home</button></a>
+      <a style="float:right"><button ng-click="search()">Search</button></a>
+      <table class="table">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+        </tr>
+      </thead>
+       <tbody ng-repeat = "x in info">
+        <tr>
+          <td><h1>{{x.firstname}} {{x.middleinit}} {{x.lastname}}</h1></td>
+        </tr>
+      </tbody>
+      </table>
+	  </div>
+    <div ng-app="myApp" ng-controller="PostController">
+      <table class="table">
+      <thead>
+        <tr>
+          <th>Posts</th>
+        </tr>
+      </thead>
+       <tbody ng-repeat = "x in posts">
+        <tr>
+          <td><h3>{{x.content}}</h3></td>
+          <td><h6>{{x.postdate}}</h6></td>
+          <td><h6>{{x.authorfname}} {{x.authorminit}} {{x.authorlname}}</h6></td>
+          <td><input type="text" ng-model="comm" placeholder="Add a comment"><button ng-click="addComment(x.postid, comm)">Comment</button></td>
+          <td><button ng-click="showComments(x.postid)" class="btn btn-default">Show Comments</button>
+        </tr>
+      </tbody>
+      </table>
+      <label><h2>Comments</h2></label>
+      <div ng-repeat="y in comments">
+         <p>{{y.postdate | date}} by {{y.commenterfname}} {{y.commenterlname}}</p>
+        <p>{{y.content}}</p>
+        <br>
+      </div>
+    </div>
+    <div ng-app="myApp" ng-controller="FriendsController">
+      <table class="table">
+      <thead>
+        <tr>
+          <th>Friends</th>
+        </tr>
+      </thead>
+       <tbody ng-repeat = "x in friends">
+        <tr>
+          <td><h3>{{x.firstname}} {{x.middleinit}} {{x.lastname}}</h3></td>
+        </tr>
+      </tbody> 
+      </table>
+    </div>
+      <a href="http://localhost:3000/addToCircle"><button>Add To Circle</button></a>
+</body>
+</html>
