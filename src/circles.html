@@ -1,0 +1,175 @@
+<html ng-app="myApp">
+<head>
+	<title>Circles</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="http://localhost:3000/external/bootstrap.min.css">
+	<script src="http://localhost:3000/external/jquery.min.js"></script>
+	<script src="http://localhost:3000/external/bootstrap.min.js"></script>
+	<script src="http://localhost:3000/external/angular.min.js"></script>
+	<script>
+	var myApp = angular.module('myApp', [])
+
+	myApp.controller('CircleController', ['$scope', '$http', function($scope, $http) {
+          $http.get('http://localhost:3000/getCircles').then(
+          function(response) {
+            //First function handles success
+              if (response.data == false) {
+                alert("Access Denied. Please log in.");
+                window.location.href = "http://localhost:3000/";
+              }
+              else {
+              	$scope.circles = response.data;
+                $scope.view = function(cname) {
+                  var circle = {
+                    circlename: cname
+                  }
+                  var jsonString = JSON.stringify(circle, null, 2);
+                    $http.get('http://localhost:3000/profile/circles/'+jsonString).then(
+                      function(response) {
+                        if (response.data == false) {
+                          alert("An error occured.");
+                        }
+                        else if (response.data == 0) {
+                          alert("No members.");
+                          $scope.members = null;
+                        }
+                        else {
+                          $scope.members = response.data;
+                        }
+                      }
+                  ) 
+                }
+                $scope.rename = function(cname) {
+                  var newName = prompt("Rename Circle", cname);
+                  if (newName != null) {
+                    var nameInfo = {
+                      oldName: cname,
+                      circlename: newName
+                    }
+                    var jsonString = JSON.stringify(nameInfo, null, 2);
+                    $http.get('http://localhost:3000/profile/circles/rename/'+jsonString).then(
+                      function(response) {
+                        if (response.data == false) {
+                          alert("An error occured.");
+                        }
+                        else {
+                          window.location.href = "http://localhost:3000/profile/viewCircles"
+                        }
+                      }
+                    )
+                  }
+                }
+                $scope.delete = function(cname) {
+                  var doDelete = confirm("Are you sure you want to delete this circle?");
+                  if (doDelete == true) {
+                    var deleteInfo = {
+                     circlename: cname
+                    }
+                    var jsonString = JSON.stringify(deleteInfo, null, 2);
+                    $http.get('http://localhost:3000/profile/circles/delete/'+jsonString).then(
+                      function(response) {
+                        if (response.data == false) {
+                          alert("An error occured.");
+                        }
+                        else {
+                          window.location.href = "http://localhost:3000/profile/viewCircles"
+                        }
+                      }
+                    )
+                  }
+                }
+                $scope.removeMember = function(userID, cname) {
+                  var doDelete = confirm("Are you sure you want to delete this person from your circle?");
+                  if (doDelete == true) {
+                    var removeInfo = {
+                     userid: userID,
+                     circlename: cname
+                    }
+                    var jsonString = JSON.stringify(removeInfo, null, 2);
+                    $http.get('http://localhost:3000/profile/circles/removeMember/'+jsonString).then(
+                      function(response) {
+                        if (response.data == false) {
+                          alert("An error occured.");
+                        }
+                        else {
+                          window.location.href = "http://localhost:3000/profile/viewCircles"
+                        }
+                      }
+                    )
+                  }
+                }
+              }
+          },
+          function(response) {
+            //Second function handles error
+            alert('Sorry, Could not find data!')
+          }
+      )
+    }])
+	myApp.controller('UserController', ['$scope', '$http', function($scope, $http) {
+         $scope.goToProfile = function() {
+            $http.get('http://localhost:3000/goToProfile/').then(
+              function(response) {
+                if (response.data == false) {
+                  alert("An error occured.");
+                }
+                else {
+                  window.location.href = "http://localhost:3000/profile"
+                }
+              }
+            ) 
+          }
+          $scope.logOut = function() {
+            $http.get('http://localhost:3000/logout/').then(
+              function(response) {
+                if (response.data == false) {
+                  alert("An error occured.");
+                }
+                else {
+                  alert("Thank you!");
+                  window.location.href = "http://localhost:3000/"
+                }
+              }
+            ) 
+          }
+          $scope.goToHome = function() {
+            window.location.href = "http://localhost:3000/feeds"
+          }
+          $scope.search = function() {
+            window.location.href = "http://localhost:3000/userSearch"
+           }
+    }])
+    </script>
+</head>
+<body>
+	<div ng-app="myApp" ng-controller="UserController">
+      <a style="float:right"><button ng-click="logOut()">Log Out</button></a>
+      <a style="float:right"><button ng-click="goToHome()">Home</button></a>
+      <a style="float:right"><button ng-click="goToProfile()">My Profile</button></a>
+      <a style="float:right"><button ng-click="search()">Search</button></a>
+	</div>
+	<div ng-app="myApp" ng-controller="CircleController">
+      <table class="table">
+      <thead>
+        <tr>
+          <th><h1>Circles</h1></th>
+        </tr>
+      </thead>
+       <tbody ng-repeat = "x in circles">
+        <tr>
+          <td><h3>{{x.circlename}}</h3></td>
+          <td><button ng-click="view(x.circlename)" class="btn btn-default">View Members</button></td>
+          <td><button ng-click="rename(x.circlename)" class="btn btn-default">Rename</button></td>
+          <td><button ng-click="delete(x.circlename)" class="btn btn-default">Delete</button></td>
+        </tr>
+      </tbody>
+      </table>
+      <label><h2>Circle Members</h2></label>
+      <div ng-repeat="y in members">
+         <p>{{y.firstname}} {{y.middleinit}} {{y.lastname}} <button ng-click="removeMember(y.userid, y.circlename)">Remove</button></p>
+        <br>
+      </div>
+	 </div>
+</body>
+</html>
